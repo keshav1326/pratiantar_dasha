@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pratiantar Dasha</title>
+  <style>
+    /* CSS styles here */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(45deg, #2980b9, #6dd5fa, #ffffff);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 95vh;
+    }
+    
+    .container {
+      text-align: center;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 400px;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #2980b9;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #555;
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      box-sizing: border-box;
+    }
+    
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    
+    p {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pratiantar Dasha</h1>
+  
+    <form id="dobForm">
+      <label for="dobInput">Enter your Date of Birth:</label>
+      <input type="text" id="dobInput" name="dobInput" placeholder="DD-MM-YYYY" />
+      <button type="submit">Calculate</button>
+    </form>
+  
+    <p id="result"></p>
+  </div>
+
+  <script>
+    document.getElementById("dobForm").addEventListener("submit", function(event) {
+      event.preventDefault(); // Prevent form submission
+      
+      var dob = document.getElementById("dobInput").value;
+      var dobParts = dob.split("-");
+      var day = parseInt(dobParts[0]);
+      var month = parseInt(dobParts[1]);
+      var year = parseInt(dobParts[2]);
+      
+      var currentDate = new Date();
+      var currentYear = currentDate.getFullYear();
+      var currentYearDigitsSum = getDigitSum(year % 100); // Calculating sum of year digits of input year
+      var currentDay = currentDate.getDay();
+      
+      var x = getXValue(day, month, year); // Calculating value of x based on input year
+      
+      var sum = getDigitSum(day) + getDigitSum(month) + currentYearDigitsSum + x;
+      
+      var tensDigit = Math.floor(sum / 10);
+      var onesDigit = sum % 10;
+      
+      var singleWord = tensDigit + onesDigit; // Storing tens and ones digit sum
+      
+      // If singleWord is two digits, convert it to a single digit
+      if (singleWord >= 10) {
+        singleWord = getDigitSum(singleWord);
+      }
+      
+      singleWord = singleWord * 8; // Multiply by 8
+      
+      var result = ""; // Reset result
+      
+      // Calculate the dasha periods based on the input date of birth
+      var dashaDays = [];
+      var dashas = ["Sun", "Moon", "Jupiter", "Rahu", "Mercury", "Venus", "Ketu", "Saturn", "Mars"];
+      
+      // Calculate the first dasha period based on singleWord
+      var startDate = new Date(year, month - 1, day);
+      var endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + singleWord);
+      result += formatDate(startDate) + " - " + formatDate(endDate) + " = " + singleWord + " Days " + "<br>";
+      
+      // Calculate subsequent dasha periods
+      for (var i = 1; i < dashas.length; i++) {
+        singleWord = (singleWord + 8) % 73; // Increment singleWord by 8 and wrap around 72 (9 planets * 8)
+        startDate = new Date(endDate); // Update startDate for the next dasha
+        endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + singleWord);
+        result += formatDate(startDate) + " - " + formatDate(endDate) + " = " + singleWord + " Days " + "<br>";
+      }
+      
+      document.getElementById("result").innerHTML = result;
+    });
+    
+    function getDigitSum(number) {
+      var sum = 0;
+      
+      while (number > 0) {
+        sum += number % 10;
+        number = Math.floor(number / 10);
+      }
+      
+      return sum;
+    }
+    
+    function getXValue(day, month, year) { // Updated to accept input year
+      var referenceYear = year; // Using input year as reference year
+      var referenceDate = new Date(referenceYear, month - 1, day); // Updated to use input year
+      var referenceDay = referenceDate.getDay();
+      
+      switch (referenceDay) {
+        case 0: // Sunday
+          return 1;
+        case 1: // Monday
+          return 2;
+        case 2: // Tuesday
+          return 9;
+        case 3: // Wednesday
+          return 5;
+        case 4: // Thursday
+          return 3;
+        case 5: // Friday
+          return 6;
+        case 6: // Saturday
+          return 8;
+        default:
+          return 0;
+      }
+    }
+    
+    function formatDate(date) {
+      var day = date.getDate();
+      var month = date.getMonth() + 1;
+      var year = date.getFullYear();
+      
+     return padNumber(day) + "/" + padNumber(month) + "/" + year;
+    }
+    
+    function padNumber(number) {
+      return number.toString().padStart(2, "0");
+    }
+  </script>
+</body>
+</html>
